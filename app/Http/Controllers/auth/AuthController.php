@@ -22,22 +22,42 @@ class AuthController extends Controller
         $username = $request->username;
         $password = $request->password;
 
-       $user = User::where(BaseModel::EMAIL, $username)
-            ->where('password', $password)
-            ->where('status', 1)
-            ->orWhere('is_admin', 1)
-            ->first();
+        $user = User::where(BaseModel::EMAIL, $username)->first();
 
-         if ($user) {
-            if (!$token = auth('api')->attempt(['email' => $username, 'password' => $password])) {
-                return parent::handleRespond(null, [], 404, 'Unauthorized');
-            }
+        error_log(json_encode($user));
 
-            return $this->respondWithToken($token);
+        if (!$user || ($user->status == 0 && $user->is_admin != 1)) {
+            return parent::handleNotFound(['email' => $username]);
         }
 
-        return parent::handleNotFound(['email' => $username]);
+        if (!$token = auth('api')->attempt(['email' => $username, 'password' => $password])) {
+            return parent::handleRespond(null, [], 404, 'Unauthorized');
+        }
+
+        return $this->respondWithToken($token);
     }
+
+    // public function login(Request $request)
+    // {
+    //     $username = $request->username;
+    //     $password = $request->password;
+
+    //    $user = User::where(BaseModel::EMAIL, $username)
+    //         ->where('password', $password)
+    //         ->where('status', 1)
+    //         ->orWhere('is_admin', 1)
+    //         ->first();
+
+    //      if ($user) {
+    //         if (!$token = auth('api')->attempt(['email' => $username, 'password' => $password])) {
+    //             return parent::handleRespond(null, [], 404, 'Unauthorized');
+    //         }
+
+    //         return $this->respondWithToken($token);
+    //     }
+
+    //     return parent::handleNotFound(['email' => $username]);
+    // }
 
 
     public function register(Request $request)
@@ -159,6 +179,6 @@ class AuthController extends Controller
 
         return parent::handleRespond($user);
 
-    }   
+    }
 
 }

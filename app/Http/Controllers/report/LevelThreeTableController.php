@@ -109,7 +109,7 @@ class LevelThreeTableController extends Controller
             $result = 2;
         } else if ($Llabel === 'NoBully' || $Llabel === 'No Bully' || $Llabel === 'ไม่มีการคุกคาม') {
             $result = 4;
-        } else if ($Llabel === 'PhysicalBully' || $Llabel === 'Physical Bully' || $Llabel === 'การคุกคามทางร่างกาย' ) {
+        } else if ($Llabel === 'PhysicalBully' || $Llabel === 'Physical Bully' || $Llabel === 'การคุกคามทางร่างกาย') {
             $result = 5;
         } else if ($Llabel === 'VerbalBullying' || $Llabel === 'Verbal Bullying' || $Llabel === 'การคุกคามทางวาจา') {
             $result = 6;
@@ -125,7 +125,7 @@ class LevelThreeTableController extends Controller
             $result = 11;
         } else if ($Llabel === 'Level 3' || $Llabel === 'ระดับ 3') {
             $result = 12;
-        } 
+        }
         return $result;
 
     }
@@ -142,7 +142,7 @@ class LevelThreeTableController extends Controller
             $raw->where('messages.number_of_shares', '>', 0);
         } else if ($label === "Share of Voice") {
             $raw->where('messages.number_of_shares', '>', 0);
-        } else if ($label === "Views") { 
+        } else if ($label === "Views") {
             $raw->where('messages.number_of_views', '>', 0);
         }
         return $raw;
@@ -225,12 +225,20 @@ class LevelThreeTableController extends Controller
 
             //Match type
             $bullytype = [
-                1 => 'Positive', 2 => 'Negative', 3 => 'Neutral',
-                4 => 'NoBully', 5 => 'Physical Bully', 6 => 'Verbal Bullying',
-                7 => 'Social Bullying', 8 => 'Cyber Bullying', 9 => 'Level 0',
-                10 => 'Level 1', 11 => 'Level 2', 12 => 'Level 3',
+                1 => 'Positive',
+                2 => 'Negative',
+                3 => 'Neutral',
+                4 => 'NoBully',
+                5 => 'Physical Bully',
+                6 => 'Verbal Bullying',
+                7 => 'Social Bullying',
+                8 => 'Cyber Bullying',
+                9 => 'Level 0',
+                10 => 'Level 1',
+                11 => 'Level 2',
+                12 => 'Level 3',
             ];
-            
+
             $sourceName = $this->matchSourceName($sources, $item->source_id);
             $sourceImage = $this->matchSourceImage($sources, $item->source_id);
             $data_push = [
@@ -344,21 +352,21 @@ class LevelThreeTableController extends Controller
             $request->report_number === '6.2.017' ||
             $request->report_number === '6.2.018'
         ) {
-            $raw_class = DB::table('messages'); 
+            $raw_class = DB::table('messages');
             // error_log(json_encode($request->report_number));
             $classification_valid = -1;
             if ($keywords) {
                 if ($request->keyword_id) {
                     $raw_class->where('messages.keyword_id', $request->keyword_id);
                 } else {
-                    
+
                     $keywordIds = $keywords->pluck('id')->all();
                     if ($keywordIds) {
-                         $raw_class->whereIn('messages.keyword_id', $keywordIds);
+                        $raw_class->whereIn('messages.keyword_id', $keywordIds);
                     }
                 }
             }
-            if ($label != '' || $Llabel != '' || $ylabel !='') {
+            if ($label != '' || $Llabel != '' || $ylabel != '') {
                 if ($this->source_id == null) {
                     $sourceId = $this->matchSourceByName($sources, $Llabel);
                     if ($sourceId) {
@@ -366,64 +374,58 @@ class LevelThreeTableController extends Controller
                     }
                 }
                 if ($classification_valid == -1)
-                
-                    if ($Llabel){
+
+                    if ($Llabel) {
                         $classification_1 = 0;
                         $classification_1 = self::parseLabelClassification($Llabel);
                         // error_log(json_encode($classification_1));
-                        if ($classification_1 > 0){
+                        if ($classification_1 > 0) {
                             $classification_valid = 1;
                         }
 
                         $classification_type = '';
                         if ($classification_1 < 4) {
                             $classification_type = 'classification_sentiment_id';
-                        }
-                        elseif ($classification_1 > 3 && $classification_1 < 9){
+                        } elseif ($classification_1 > 3 && $classification_1 < 9) {
                             $classification_type = 'classification_type_id';
-                        }
-                        elseif ($classification_1 > 8) {
+                        } elseif ($classification_1 > 8) {
                             $classification_type = 'classification_level_id';
                         }
                     }
 
-                    if ($label){
-                        $classification_2 = 0;
-                        $classification_2 = self::parseLabelClassification($label);
-                        if ($classification_2 > 0){
-                            $classification_valid = 1;
-                        }
-                        
-                        $classification_type_2 = '';
-                        if ($classification_2 < 4) {
-                            $classification_type_2 = 'classification_sentiment_id';
-                        }
-                        elseif ($classification_2 > 3 && $classification_2 < 9){
-                            $classification_type_2 = 'classification_type_id';
-                        }
-                        elseif ($classification_2 > 8) {
-                            $classification_type_2 = 'classification_level_id';
-                        }
+                if ($label) {
+                    $classification_2 = 0;
+                    $classification_2 = self::parseLabelClassification($label);
+                    if ($classification_2 > 0) {
+                        $classification_valid = 1;
                     }
 
-                    if ($ylabel){
-                        $classification_3 = 0;
-                        $classification_3 = self::parseLabelClassification($ylabel);
-                        if ($classification_3 > 0){
-                            $classification_valid = 1;
-                        }
-
-                        $classification_type_3 = '';
-                        if ($classification_3 < 4) {
-                            $classification_type_3 = 'classification_sentiment_id';
-                        }
-                        elseif ($classification_3 > 3 && $classification_3 < 9){
-                            $classification_type_3 = 'classification_type_id';
-                        }
-                        elseif ($classification_3 > 8) {
-                            $classification_type_3 = 'classification_level_id';
-                        }
+                    $classification_type_2 = '';
+                    if ($classification_2 < 4) {
+                        $classification_type_2 = 'classification_sentiment_id';
+                    } elseif ($classification_2 > 3 && $classification_2 < 9) {
+                        $classification_type_2 = 'classification_type_id';
+                    } elseif ($classification_2 > 8) {
+                        $classification_type_2 = 'classification_level_id';
                     }
+                }
+
+                if ($ylabel) {
+                    $classification_3 = 0;
+                    $classification_3 = self::parseLabelClassification($ylabel);
+                    if ($classification_3 > 0) {
+                        $classification_valid = 1;
+                    }
+
+                    $classification_type_3 = '';
+                    if ($classification_3 < 4) {
+                        $classification_type_3 = 'classification_sentiment_id';
+                    } elseif ($classification_3 > 3 && $classification_3 < 9) {
+                        $classification_type_3 = 'classification_type_id';
+                    } elseif ($classification_3 > 8) {
+                        $classification_type_3 = 'classification_level_id';
+                    }
+                }
             }
 
             if ($classification_valid != -1) {
@@ -435,29 +437,30 @@ class LevelThreeTableController extends Controller
                     'message_results_2.media_type',
                     'message_results_2.classification_sentiment_id',
                     'message_results_2.classification_type_id',
-                    'message_results_2.classification_level_id',                    
+                    'message_results_2.classification_level_id',
                     // 'message_results.classification_type_id',
                     // 'message_results.classification_id',
                     'messages.created_at AS scraping_time',
                 ]);
                 $raw_class->leftJoin('message_results_2', 'message_results_2.message_id', '=', 'messages.id');
                 $raw_class->where('message_results_2.media_type', 1);
-                
-                if ($Llabel && $classification_1 > 0){ 
-                    $raw_class->where('message_results_2.'. $classification_type, $classification_1);
+
+                if ($Llabel && $classification_1 > 0) {
+                    $raw_class->where('message_results_2.' . $classification_type, $classification_1);
                 }
-                if ($label && $classification_2 > 0){
-                    $raw_class->where('message_results_2.'. $classification_type_2, $classification_2);
+                if ($label && $classification_2 > 0) {
+                    $raw_class->where('message_results_2.' . $classification_type_2, $classification_2);
                 }
-                if ($ylabel && $classification_3 > 0){
-                    $raw_class->where('message_results_2.'. $classification_type_3, $classification_3);
+                if ($ylabel && $classification_3 > 0) {
+                    $raw_class->where('message_results_2.' . $classification_type_3, $classification_3);
                 }
                 // $raw_class->whereBetween('messages.created_at', [$this->start_date . " 00:00:01", $this->end_date . " 23:59:59"]);
 
-                if ($request->report_number === '6.2.002' || 
+                if (
+                    $request->report_number === '6.2.002' ||
                     $request->report_number === '6.2.012'
-                    ) 
-                { try {
+                ) {
+                    try {
                         $date = Carbon::createFromFormat('d/m/Y', $label);
                         $errors = Carbon::getLastErrors();
 
@@ -474,10 +477,10 @@ class LevelThreeTableController extends Controller
                 }
                 if ($labelformat) {
                     $raw_class->whereBetween('messages.created_at', [$labelformat . " 00:00:01", $labelformat . " 23:59:59"]);
-                } else 
+                } else
                     $raw_class->whereBetween('messages.created_at', [$this->start_date . " 00:00:01", $this->end_date . " 23:59:59"]);
 
-        
+
                 if ($this->source_id) {
                     if (is_array($this->source_id) && count($this->source_id) > 1) {
                         $raw_class->whereIn('source_id', $this->source_id);
@@ -495,10 +498,10 @@ class LevelThreeTableController extends Controller
             if ($request->keyword_id) {
                 $raw->where('messages.keyword_id', $request->keyword_id);
             } else {
-                
+
                 $keywordIds = $keywords->pluck('id')->all();
                 if ($keywordIds) {
-                     $raw->whereIn('messages.keyword_id', $keywordIds);
+                    $raw->whereIn('messages.keyword_id', $keywordIds);
                 }
             }
         }
@@ -634,7 +637,7 @@ class LevelThreeTableController extends Controller
                 'message_type' => "messages.message_type",
                 'author' => "messages.author",
                 'date' => "messages.message_datetime",
-                'scrapingtime'=>"messages.created_at", 
+                'scrapingtime' => "messages.created_at",
                 'device' => "messages.device",
                 'source' => "messages.source_id",
                 //'bully_level', 'bully_type', 'sentiment' => "message_results.classification_id",
@@ -691,16 +694,18 @@ class LevelThreeTableController extends Controller
                 // error_log('date request :'.json_encode($date_request));
                 // error_log('start_date :'.json_encode($this->start_date));
                 // error_log('end_date :'.json_encode($this->end_date));
-                
-                if ($request->report_number === '1.2.002' ||
-                    $request->report_number === '4.2.002') {
+
+                if (
+                    $request->report_number === '1.2.002' ||
+                    $request->report_number === '4.2.002'
+                ) {
                     $keyword = Keyword::where('name', $Llabel)
-                    ->where('status', 1)
-                    ->first();
+                        ->where('status', 1)
+                        ->first();
                     if ($keyword) {
                         $raw->where('messages.keyword_id', $keyword->id);
                     }
-                } 
+                }
             } else {
 
             }
@@ -717,12 +722,12 @@ class LevelThreeTableController extends Controller
             $request->report_number === '6.2.013'
         ) {
             //$isHasMessageDate = false;
-        //     if ($request->label){
-        //         $raw->whereRaw('DATE_FORMAT(tbl_messages.created_at, "%a") = ?', [$request->label]);
-        //         error_log(json_encode([$request->label]));
-        //     }
-            
-        // }
+            //     if ($request->label){
+            //         $raw->whereRaw('DATE_FORMAT(tbl_messages.created_at, "%a") = ?', [$request->label]);
+            //         error_log(json_encode([$request->label]));
+            //     }
+
+            // }
 
             if ($request->label) {
                 $thaiToEng = [
@@ -775,7 +780,8 @@ class LevelThreeTableController extends Controller
             $request->report_number === '6.2.016'
         ) {
 
-            if ($request->report_number === '2.2.006'
+            if (
+                $request->report_number === '2.2.006'
                 || $request->report_number === '3.2.006'
                 || $request->report_number === '4.2.006'
                 || $request->report_number === '5.2.006'
@@ -797,18 +803,18 @@ class LevelThreeTableController extends Controller
         }
 
         //Day&Time
-        if(
+        if (
             $request->report_number === '2.2.016' ||
             $request->report_number === '2.2.017' ||
             $request->report_number === '2.2.018' ||
-            $request->report_number === '2.2.019' 
+            $request->report_number === '2.2.019'
         ) {
             if (isset($request->label) && is_numeric($request->label)) {
-                if($request->report_number === '2.2.016'){
+                if ($request->report_number === '2.2.016') {
                     $raw->whereRaw('DATE_FORMAT(tbl_messages.created_at, "%a") = ?', [$request->ylabel]);
                 }
                 $raw->whereRaw('HOUR(tbl_messages.created_at) >= ? AND HOUR(tbl_messages.created_at) < ?', [$request->label, $request->label + 1]);
-               
+
             } else {
                 $raw->whereRaw('DATE_FORMAT(tbl_messages.created_at, "%a") = ?', [$request->label]);
             }
@@ -925,7 +931,7 @@ class LevelThreeTableController extends Controller
                 'message_type' => "messages.message_type",
                 'author' => "messages.author",
                 'date' => "messages.message_datetime",
-                'scrapingtime'=>"messages.created_at",
+                'scrapingtime' => "messages.created_at",
                 'device' => "messages.device",
                 'source' => "sources_id",
                 'sentiment', 'engagement', 'bully_type' => "classifications_id",
@@ -1185,7 +1191,7 @@ class LevelThreeTableController extends Controller
 
         return parent::handleRespond(null, null, 404, 'Plase send id of message');
     }
-    
+
     public function exportMonitoring(Request $request)
     {
 
@@ -1215,20 +1221,24 @@ class LevelThreeTableController extends Controller
         $messageResult = DB::table('messages')
             ->join('message_results_2', 'message_results_2.message_id', '=', 'messages.id')
             ->select([
-                    'messages.full_message',
-                    'messages.message_type',
-                    'messages.author',
-                    'messages.message_datetime as date_m',
-                    'messages.created_at as scraping_time',
-                    'messages.source_id',
-                    'messages.total_engagement',
-                    'messages.link_message',
-                    'message_results_2.media_type',
-                    'message_results_2.message_id',
-                    'message_results_2.classification_sentiment_id as sentiment', 
-                    'message_results_2.classification_type_id as bully_type', 
-                    'message_results_2.classification_level_id as bully_level',
-                    ])
+                'messages.full_message',
+                'messages.message_type',
+                'messages.author',
+                'messages.message_datetime as date_m',
+                'messages.created_at as scraping_time',
+                'messages.source_id',
+                // 'messages.total_engagement',
+                'messages.number_of_views',
+                'messages.number_of_comments',
+                'messages.number_of_shares',
+                'messages.number_of_reactions',
+                'messages.link_message',
+                'message_results_2.media_type',
+                'message_results_2.message_id',
+                'message_results_2.classification_sentiment_id as sentiment',
+                'message_results_2.classification_type_id as bully_type',
+                'message_results_2.classification_level_id as bully_level',
+            ])
             // ->where('message_results_2.media_type', 1)
             ->whereIn('messages.id', $messageIds);
 
@@ -1241,7 +1251,7 @@ class LevelThreeTableController extends Controller
             // $message->sentiment = "";
             // $message->bully_type = "";
             // $message->bully_level = "";
-            
+
             // foreach ($messageResult as $item) {
             //     if ($message->id == $item->message_id) { 
             //         if ($item->classification_sentiment_id){
@@ -1260,19 +1270,19 @@ class LevelThreeTableController extends Controller
 
         }
 
-            // $count = 0;
-            // foreach ($messageResult as $item) {
-            //     if ($message->id == $item->message_id) {
-            //         $count++;
-            // $message = $this->packObjectClassificationTypeName($classificationTypes, $item, $message);
-            //         // error_log(json_encode($message));
-            //     }
-            //     if ($count > 2) {
-            //         break;
-            //     }
-            // }
-    //         $result[] = $message;
-    // }
+        // $count = 0;
+        // foreach ($messageResult as $item) {
+        //     if ($message->id == $item->message_id) {
+        //         $count++;
+        // $message = $this->packObjectClassificationTypeName($classificationTypes, $item, $message);
+        //         // error_log(json_encode($message));
+        //     }
+        //     if ($count > 2) {
+        //         break;
+        //     }
+        // }
+        //         $result[] = $message;
+        // }
         //return parent::handleRespond($result);
         return Excel::download(new MonitoringExport($result, "dailyMessage", $sources, $keywords), 'Monitoring-' . Carbon::now() . '.xlsx');
     }
