@@ -5,6 +5,8 @@ namespace App\Http\Controllers\auth;
 use App\Http\Controllers\Controller;
 use App\Models\BaseModel;
 use App\Models\User;
+use app\Models\Organization;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -24,9 +26,15 @@ class AuthController extends Controller
 
         $user = User::where(BaseModel::EMAIL, $username)->first();
 
-        error_log(json_encode($user));
+        $organize_id = $user ? $user->organization_id : null;
+        if ($organize_id) {
+            $organize_status = DB::table('organizations')->where('id', $organize_id)->value('status');
+        }
 
-        if (!$user || ($user->status == 0 && $user->is_admin != 1)) {
+        error_log(json_encode($user));
+        error_log(json_encode($organize_status));
+
+        if (!$user || !$organize_status || ($user->status == 0 && $organize_status == 0 && $user->is_admin != 1)) {
             return parent::handleNotFound(['email' => $username]);
         }
 
