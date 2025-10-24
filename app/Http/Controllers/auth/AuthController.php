@@ -27,14 +27,21 @@ class AuthController extends Controller
         $user = User::where(BaseModel::EMAIL, $username)->first();
 
         $organize_id = $user ? $user->organization_id : null;
+        $role_id = $user ? $user->role_id : null;
+
         if ($organize_id) {
             $organize_status = DB::table('organizations')->where('id', $organize_id)->value('status');
         }
 
+        if ($role_id) {
+            $role_status = DB::table('user_roles')->where('id', $role_id)->value('status');
+        }
+
         error_log(json_encode($user));
         error_log(json_encode($organize_status));
+        error_log(json_encode($role_status));
 
-        if (!$user || !$organize_status || ($user->status == 0 && $organize_status == 0 && $user->is_admin != 1)) {
+        if (!$user || !$organize_id || !$role_id || ($user->status == 0 && $user->is_admin != 1) || $organize_status == 0 || $role_status == 0) {
             return parent::handleNotFound(['email' => $username]);
         }
 

@@ -788,16 +788,21 @@ class LevelThreeTableController extends Controller
                 || $request->report_number === '6.2.006'
                 || $request->report_number === '6.2.016'
             ) {
-                if ($request->label === 'Influencer' || $request->label === 'เจ้าของโพสต์') {
-                    $raw->where('reference_message_id', '');
-                } else {
-                    $raw->where('reference_message_id', '!=', '');
+                if ($request->label != '') {
+                    // error_log('label in if:' . $request->label);
+                    if ($request->label === 'Influencer' || $request->label === 'เจ้าของโพสต์') {
+                        $raw->where('reference_message_id', '');
+                    } else {
+                        $raw->where('reference_message_id', '!=', '');
+                    }
                 }
             } else {
-                if ($request->label === 'Post Owner' || $request->label === 'เจ้าของโพสต์') {
-                    $raw->where('reference_message_id', '=', '');
-                } else {
-                    $raw->where('reference_message_id', '!=', '');
+                if ($request->label != '') {
+                    if ($request->label === 'Post Owner' || $request->label === 'เจ้าของโพสต์') {
+                        $raw->where('reference_message_id', '=', '');
+                    } else {
+                        $raw->where('reference_message_id', '!=', '');
+                    }
                 }
             }
         }
